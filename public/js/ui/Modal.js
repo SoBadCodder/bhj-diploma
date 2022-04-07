@@ -4,7 +4,7 @@
  * В первую очередь это открытие или
  * закрытие имеющихся окон
  * */
-class Modal {
+ class Modal {
   /**
    * Устанавливает текущий элемент в свойство element
    * Регистрирует обработчики событий с помощью Modal.registerEvents()
@@ -12,10 +12,10 @@ class Modal {
    * необходимо выкинуть ошибку.
    * */
   constructor(element){
-    this.element = element;
-    if(!this.element){
-      throw new Error('Получен пустой элемент');
+    if (!element) {
+      throw new Error("Невалидное значение для Modal");
     }
+    this.element = element;
     this.registerEvents();
   }
 
@@ -25,14 +25,15 @@ class Modal {
    * (с помощью метода Modal.onClose)
    * */
   registerEvents() {
-    const dataDismiss = this.element.querySelectorAll('[data-dismiss="modal"]');
-
-    dataDismiss.forEach(item => {
-      item.onclick = (event) => {
-        event.preventDefault();
-        this.onClose(event);
+    const elementBtns = this.element.getElementsByTagName('button');
+    for (let button of elementBtns) {
+      if (button.hasAttribute('data-dismiss') && button.dataset.dismiss === 'modal') {
+        button.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          this.onClose(button);
+        });
       }
-    });
+    }
   }
 
   /**
@@ -40,7 +41,7 @@ class Modal {
    * Закрывает текущее окно (Modal.close())
    * */
   onClose(e) {
-    this.close();
+    e.onClick = this.close();
   }
   /**
    * Открывает окно: устанавливает CSS-свойство display
@@ -53,6 +54,6 @@ class Modal {
    * Закрывает окно: удаляет CSS-свойство display
    * */
   close(){
-    this.element.style.display = 'none';
+    this.element.removeAttribute('style');
   }
 }

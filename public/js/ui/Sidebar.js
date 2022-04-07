@@ -3,7 +3,7 @@
  * кнопки скрытия/показа колонки в мобильной версии сайта
  * и за кнопки меню
  * */
-class Sidebar {
+ class Sidebar {
   /**
    * Запускает initAuthLinks и initToggleButton
    * */
@@ -18,13 +18,13 @@ class Sidebar {
    * при нажатии на кнопку .sidebar-toggle
    * */
   static initToggleButton() {
-    const bodySidebar = document.querySelector('body');
-    const buttonSidebar = document.querySelector('.sidebar-toggle');
-    buttonSidebar.onclick = (event) => {
-      event.preventDefault();
-      bodySidebar.classList.toggle('sidebar-open');
-      bodySidebar.classList.toggle('sidebar-collapse');
-    }
+    const sidebarBtn = document.querySelector('a.sidebar-toggle');
+    sidebarBtn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const sidebarMini = document.querySelector('body.sidebar-mini');
+      sidebarMini.classList.toggle('sidebar-open');
+      sidebarMini.classList.toggle('sidebar-collapse'); //для совместимости с Fire-Fox
+    });
   }
 
   /**
@@ -35,29 +35,24 @@ class Sidebar {
    * выходу устанавливает App.setState( 'init' )
    * */
   static initAuthLinks() {
-    const loginButton = document.querySelector('.menu-item_login');
-    const logoutButton = document.querySelector('.menu-item_logout');
-    const registerButton = document.querySelector('.menu-item_register');
-
-    loginButton.onclick = (event) => {
-      event.preventDefault();
-      const appModal = App.getModal('login');
-      appModal.open();
-    }
-    logoutButton.onclick = (event) => {
-      event.preventDefault();
-      User.logout({}, (err, response) =>{
-        if (response.success) {
-          App.setState('init');
-        } else {
-          console.log(err);
+    const sidebarCtrlBtns = document.querySelectorAll('.sidebar-menu');
+    sidebarCtrlBtns.forEach(button => {
+      button.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        switch (ev.target.closest('li').classList[1]) {
+          case 'menu-item_login':
+            App.getModal('login').open();
+          break;
+          case 'menu-item_register':
+            App.getModal('register').open();
+          break;
+          case 'menu-item_logout':
+            User.logout(response => 
+                App.setState('init')
+              );
+          break;
         }
-      })
-    }
-    registerButton.onclick = (event) => {
-      event.preventDefault();
-      const appModal = App.getModal('register');
-      appModal.open();
-    }
+      });
+    });
   }
 }
